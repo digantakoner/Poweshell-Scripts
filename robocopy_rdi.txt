@@ -1,0 +1,10 @@
+robocopy "\\logfile\Log" "C:\Personal Data\robocopy_test" /e /z  /log+:"C:\Personal Data\robocopy_test\logs.txt"
+
+
+robocopy "\\source" "dest" /e /z /maxage:1 /log+:"C:\robocopy_test\logs.txt"
+
+
+robocopy "src" "dest" /e /z /maxage:1 /log+:"C:\robocopy_test\logs.txt"
+
+
+robocopy "\\src" "\\dest" /e /z /maxage:1 /log+:"C:\Robocopy_test\Quality\logs.txt"

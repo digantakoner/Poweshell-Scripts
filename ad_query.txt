@@ -1,0 +1,3 @@
+PS C:\Users\> Get-ADComputer -SearchBase 'OU=,DC=,DC=,DC=' -Filter * -Properties * |
+ FT Name, OperatingSystem, OperatingSystemServicePack, OperatingSystemVersion -Wrap -Auto >C:\servers.txt
+PS C:\Users\>

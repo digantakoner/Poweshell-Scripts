@@ -1,0 +1,5 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo dpkg -i icaclient_13.10.0.20_armhf.deb
+sudo apt –fix-broken install
+sudo dpkg -i icaclient_13.10.0.20_armhf.deb

@@ -1,0 +1,1 @@
+CCMSetup.exe /uninstall

@@ -1,0 +1,1 @@
+﻿Get-ADComputer -Filter {OperatingSystem -Like 'Windows Server*'} -Property * -SearchBase "OU=AGSC,DC=apac, DC=corpdir, DC=net" | Select-Object Name,OperatingSystem,OperatingSystemServicePack | Export-Csv -Path 'C:\AD_Servers.csv' -NoTypeInformation -Append

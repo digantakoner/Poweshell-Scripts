@@ -1,0 +1,9 @@
+Folder Path,FileSystemRights,AccessControlType,IdentityReference,IsInherited,InheritanceFlags,PropagationFlags
+,"Modify, Synchronize",Allow,,TRUE,"ContainerInherit, ObjectInherit",None
+,FullControl,Allow,,TRUE,"ContainerInherit, ObjectInherit",None
+,"Modify, Synchronize",Allow,,TRUE,"ContainerInherit, ObjectInherit",None
+,FullControl,Allow,,TRUE,"ContainerInherit, ObjectInherit",None
+,"Modify, Synchronize",Allow,,TRUE,"ContainerInherit, ObjectInherit",None
+,"Modify, Synchronize",Allow,,TRUE,"ContainerInherit, ObjectInherit",None
+,"ReadAndExecute, Synchronize",Allow,,TRUE,"ContainerInherit, ObjectInherit",None
+,FullControl,Allow,,TRUE,"ContainerInherit, ObjectInherit",None

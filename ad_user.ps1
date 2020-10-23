@@ -1,0 +1,1 @@
+﻿ Get-ADUser -Server "DC NAME" -SearchBase 'OU=,DC=,DC=,DC=' -Filter * -Properties * | FT Name,Designation -Wrap -Auto >C:\users.txt
