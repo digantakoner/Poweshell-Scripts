@@ -1,0 +1,17 @@
+//=====================Local Group Members, Includes Administrators 
+//Pre-requisite: recurring Advertisement, or Recurring DCM Baseline/CI 
+//==================================================================== 
+#pragma deleteclass ("LocalGroupMembers",NOFAIL) 
+[ SMS_Report     (TRUE), 
+  SMS_Group_Name ("LocalGroupMembers"), 
+  SMS_Class_ID   ("LocalGroupMembers") ] 
+class cm_LocalGroupMembers : SMS_Class_Template 
+{ 
+    [SMS_Report (TRUE), key ] string Account; 
+    [SMS_Report (TRUE)      ] string Category; 
+    [SMS_Report (FALSE)     ] string Disabled; 
+    [SMS_Report (TRUE), key ] string Domain; 
+    [SMS_Report (FALSE)     ] string GroupSID; 
+    [SMS_Report (TRUE), key ] string Name; 
+    [SMS_Report (TRUE)      ] string Type; 
+}; 

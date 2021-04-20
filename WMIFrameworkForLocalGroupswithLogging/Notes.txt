@@ -1,0 +1,61 @@
+
+2017: Adam MacMurray found that in his environment, he needed an additional ,key field, for Domain.  Script and mof imported edited for that circumstance.
+
+2014: The clients I personally support all use EN-US as the language (1033); if you use another language on your operating system, naturally the language reflected will differ.  For any reports, etc. where I mention "Administrator" in a report, replace with your local Language's spelling of group names.
+
+2014: The script uses a ! as a delimiter; if you happen to have account names which use a ! in their name itself, this quirk of the script will skew your results for reporting.  You may want to edit the script, and use a different delimiter on lines 107, and 135
+
+A couple sample reports:
+
+Report #1:  Since most of the time, "in general" people mostly care about local Administrator group, ... Members of the local Administatros group for a specific computer
+
+select lgm.name0 [Name of the Local Group]
+,lgm.Account0 [Account]
+,lgm.Category0 [Category of Account]
+,lgm.Domain0 [Domain for the Account]
+,lgm.Type0 [Type of Account]
+from v_gs_localGroupMembers0 lgm
+join v_r_system sys1 on sys1.resourceid=lgm.resourceid
+where lgm.name0 = 'Administrators'
+and sys1.Netbios_Name0 = 'ComputerNameHer'
+
+Report #2:  "users which are unexpectedly in the local Administrator Group"
+select lgm.name0 [Name of the Local Group]
+,lgm.Account0 [Account]
+,lgm.Category0 [Category of Account]
+,lgm.Domain0 [Domain for the Account]
+,lgm.Type0 [Type of Account]
+from v_gs_localGroupMembers0 lgm
+join v_r_system sys1 on sys1.resourceid=lgm.resourceid
+where lgm.name0 = 'Administrators'
+and lgm.type0 = 'local'
+and lgm.category0 = 'userAccount'
+and lgm.account0 not in ('Administrator','Guest')
+order by sys1.netbios_name0, lgm.name0, lgm.account0
+
+Report #3:  This is the most complex; but gets you a lot of complicated information.  PRESUMING you have daily hardware inventory and daily run the baseline, using "about 3 days old ish" as a guesstimate for "reliability", this would show a vague reliability of the information returned, based on 3 days as the delimiter for that.
+
+declare @olddcm datetime 
+declare @oldhinv datetime
+set @oldDCM=DATEADD(DAY,-3, getdate())
+set @oldHinv=DATEADD(DAY,-3, getdate())
+select sys1.netbios_name0
+,lgm.name0 [Name of the local Group]
+,lgm.account0 as [Account Contained within the Group]
+, lgm.category0 [Account Type]
+, lgm.domain0 [Domain for Account]
+, lgm.type0 [Type of Account]
+, case when ws.lasthwscan < @oldhinv then 'Last Hinv might be out of date' 
+ when cs.lastcompliancemessagetime < @olddcm then 'CI evaluation might be out of date'
+ when ws.lasthwscan < cs.lastcompliancemessagetime then 'CI evaluated since hinv, not necessarily unreliable'
+  else 'Recent CI Eval, Hinv since CI Eval = Fairly Reliable'
+end as [Reliability of Information]
+from
+v_gs_localgroupmembers0 lgm
+join v_gs_workstation_status ws on ws.resourceid=lgm.resourceid
+join v_r_system_valid sys1 on sys1.resourceid=lgm.resourceid
+left join v_CICurrentComplianceStatus cs on cs.resourceid=lgm.resourceid
+left join v_LocalizedCIProperties_SiteLoc loc on loc.ci_id=cs.ci_id
+where loc.displayname = 'local group members into WMI'
+order by sys1.netbios_name0, lgm.name0, lgm.account0
+
