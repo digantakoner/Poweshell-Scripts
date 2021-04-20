@@ -1,0 +1,1 @@
+powershell.exe "C:\Users\dikoner\Desktop\KillProcAfterInactivity.ps1"
