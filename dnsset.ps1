@@ -1,5 +1,5 @@
 ﻿$Computerlist = get-content "C:\scomlist.txt"
-$dnsservers =@("53.150.6.254","53.150.9.254")
+$dnsservers =@("53.127.137.254","53.127.140.254")
 
 foreach ($computername in $computerlist) {
     #$result =  get-wmiobject win32_pingstatus -filter "address='$computername'"
