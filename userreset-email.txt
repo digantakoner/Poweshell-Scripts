@@ -1,0 +1,80 @@
+#We set the credentials used to send the e-mail – in the example its helpdesk@fabricam.com - and password for the account.
+
+
+#We import the users from the list:
+$Users = Import-Csv –Path "c:\test1\users.csv"
+#We choose which OU in fabricam.com contains the users we would like to change passwords for
+#$UserOU = "OU=Test OU,OU=Users,DC=Fabricam,DC=com"
+function New-RandomPassword {
+#&lt;
+#&gt;
+[CmdletBinding()]
+Param(
+[Parameter(
+Mandatory = $true,
+Position = 1
+)] [System.Int32] $Length
+)
+$arrUpperCase = @('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','!','@','#','$','%','^','&','*')
+$arrLowerCase = @('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','!','@','#','$','%','^','&','*')
+$arrNumbers = @('1','2','3','4','5','6','7','8','9','0')
+$intLength = 8
+$intAmountU = Get-Random -Minimum 1 -Maximum ($Length-2)
+$intAmountL = Get-Random -Minimum 1 -Maximum ($Length-$intAmountU-1)
+$intAmountN = $Length-$intAmountU-$intAmountL
+$arrFormat = New-Object System.Collections.ArrayList
+for($i=0;$i -lt $intAmountU;$i++){
+[void]$arrFormat.Add('U')
+}
+for($i=0;$i -lt $intAmountL;$i++){
+[void]$arrFormat.Add('L')
+}
+for($i=0;$i -lt $intAmountN;$i++){
+[void]$arrFormat.Add('N')
+}
+$strPassword = "";
+while($arrFormat.Count -gt 0){
+$chrType = $arrFormat[(Get-Random $arrFormat.Count)]
+if($chrType -eq 'U'){
+$strPassword += (Get-Random $arrUpperCase)
+} elseif($chrType -eq 'L'){
+$strPassword += (Get-Random $arrLowerCase)
+} elseif($chrType -eq 'N'){
+$strPassword += (Get-Random $arrNumbers)
+}
+$arrFormat.Remove($chrType)
+}
+Write-Output $strPassword
+}
+#For each user we will get the attributes needed to process the commands
+foreach ($User in $Users) {
+$UserGivenName = $User.GivenName
+$UserEmailAddress = $User.EmailAddress
+$UserPrincipalName = $User.UserPrincipalName
+$NewPassword = New-RandomPassword 20
+$securepassword=ConvertTo-SecureString $NewPassword -AsPlainText -Force
+
+#Setting the new password on each object in AD:
+Get-ADUser -Filter {UserPrincipalName -eq $UserPrincipalName} | Set-ADAccountPassword -NewPassword $securepassword -Reset -PassThru | Set-ADuser -ChangePasswordAtLogon $True
+#Creating and sending e-mail to users EmailAddress
+#Setting mail-properties
+$From = "Wintel_MBRDI@daimler.com"
+$To = "$UserEmailAddress"
+$Subject = "Your new password for wintel"
+$SMTPServer = "53.151.100.102"
+$SMTPPort = "25"
+# CC can be used to send copy of email to an administrator/helpdesk for password reference:
+#$Cc = "helpdesk@contoso.com"
+#$Attachment1 = "C:\temp\help me.docx"
+#$Attachment2 = "C:\temp\attachment2.docx"
+#Creating the body-text in html. <br> = new line.
+$Body = "Hello $UserGivenName, <br><br>"
+$Body += "This e-mail contains your user name and first time password for signing into fabricam.com services: <br><br>"
+$Body += "User Name and E-mail address is: $UserPrincipalName <br>"
+$Body += "Password: <b>$NewPassword </b><br><br>"
+$Body += "Regards, <br>"
+$Body += "Fabricam Helpdesk <br>"
+Send-MailMessage -From $From -to $To -Subject $Subject `
+-Body $Body -BodyAsHtml -Encoding UTF8 -SmtpServer $SMTPServer -port $SMTPPort
+#-Attachments $Attachment1, $Attachment2
+}
